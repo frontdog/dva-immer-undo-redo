@@ -5,6 +5,8 @@ import { AnyAction } from 'redux';
 export interface IUndoRedoState {
   canUndo: boolean;
   canRedo: boolean;
+  undoCount: number;
+  redoCount: number;
 }
 
 export interface IDvaUndoRedoPluginOptions {
@@ -28,6 +30,8 @@ const defaultOptions: IDvaUndoRedoPluginOptions = {
 const initialState: IUndoRedoState = {
   canUndo: false,
   canRedo: false,
+  undoCount: 0,
+  redoCount: 0,
 };
 
 export default <IState = any>(options: IDvaUndoRedoPluginOptions = defaultOptions) => {
@@ -64,16 +68,21 @@ export default <IState = any>(options: IDvaUndoRedoPluginOptions = defaultOption
             if (newOptions.include.includes(namespace) && !namespace.includes('@@')) {
               // Clear the redo stack when a new change comes.
               inverseStack = [];
-              // Make sure the length of changes is less than options.limit
-              stack = stack.slice(-<number>newOptions.limit);
               if (action.clear === true) {
                 stack = [];
               } else if (action.replace === true) {
-                stack.pop();
+                const stackItem = stack.pop();
+                if (stackItem) {
+                  const { patches: itemPatches, inversePatches: itemInversePatches } = stackItem;
+                  patches = [...itemPatches, ...patches];
+                  inversePatches = [...inversePatches, ...itemInversePatches]
+                }
               }
-              if (action.escape !== true && action.clear !== true) {
+              if (action.clear !== true) {
                 stack.push({ namespace, patches, inversePatches });
               }
+              // Make sure the length of changes is less than options.limit
+              stack = stack.slice(-<number>newOptions.limit);
             }
           }
         });
@@ -128,6 +137,12 @@ export default <IState = any>(options: IDvaUndoRedoPluginOptions = defaultOption
           }
           if (draft[namespace].canRedo !== canRedo) {
             draft[namespace].canRedo = canRedo;
+          }
+          if (draft[namespace].undoCount !== stack.length) {
+            draft[namespace].undoCount = stack.length;
+          }
+          if (draft[namespace].redoCount !== inverseStack.length) {
+            draft[namespace].redoCount = inverseStack.length;
           }
         });
       };

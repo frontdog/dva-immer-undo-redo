@@ -4,12 +4,17 @@
   "description": "A plugin for dva to undo or redo.",
   "main": "index.js",
   "scripts": {
-    "dev": "tsc -p tsconfig.json --watch"
+    "dev": "tsc -p tsconfig.json --watch",
+    "test": "umi-test"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "typescript": "^3.8.2"
+    "dva": "^2.4.1",
+    "immer": "^5.3.6",
+    "redux": "^4.0.5",
+    "typescript": "^3.8.2",
+    "umi-test": "^1.9.3"
   },
   "peerDependencies": {
     "dva": "^2.x",

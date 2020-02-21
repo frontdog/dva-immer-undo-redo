@@ -10,6 +10,13 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
+var __spreadArrays = (this && this.__spreadArrays) || function () {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+};
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
@@ -27,6 +34,8 @@ var defaultOptions = {
 var initialState = {
     canUndo: false,
     canRedo: false,
+    undoCount: 0,
+    redoCount: 0,
 };
 exports.default = (function (options) {
     var _a;
@@ -63,17 +72,22 @@ exports.default = (function (options) {
                         if (newOptions.include.includes(namespace_1) && !namespace_1.includes('@@')) {
                             // Clear the redo stack when a new change comes.
                             inverseStack = [];
-                            // Make sure the length of changes is less than options.limit
-                            stack = stack.slice(-newOptions.limit);
                             if (action.clear === true) {
                                 stack = [];
                             }
                             else if (action.replace === true) {
-                                stack.pop();
+                                var stackItem = stack.pop();
+                                if (stackItem) {
+                                    var itemPatches = stackItem.patches, itemInversePatches = stackItem.inversePatches;
+                                    patches = __spreadArrays(itemPatches, patches);
+                                    inversePatches = __spreadArrays(inversePatches, itemInversePatches);
+                                }
                             }
-                            if (action.escape !== true && action.clear !== true) {
+                            if (action.clear !== true) {
                                 stack.push({ namespace: namespace_1, patches: patches, inversePatches: inversePatches });
                             }
+                            // Make sure the length of changes is less than options.limit
+                            stack = stack.slice(-newOptions.limit);
                         }
                     }
                 });
@@ -129,6 +143,12 @@ exports.default = (function (options) {
                     }
                     if (draft[namespace].canRedo !== canRedo) {
                         draft[namespace].canRedo = canRedo;
+                    }
+                    if (draft[namespace].undoCount !== stack.length) {
+                        draft[namespace].undoCount = stack.length;
+                    }
+                    if (draft[namespace].redoCount !== inverseStack.length) {
+                        draft[namespace].redoCount = inverseStack.length;
                     }
                 });
             };
