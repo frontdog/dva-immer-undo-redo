@@ -1,0 +1,23 @@
+{
+  "name": "dva-immer-undo-redo",
+  "version": "1.0.0",
+  "description": "A plugin for dva to undo or redo.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsc -p tsconfig.json --watch"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^3.8.2"
+  },
+  "peerDependencies": {
+    "dva": "^2.x",
+    "immer": "^5.x",
+    "redux": "^4.x"
+  },
+  "files": [
+    "./index.d.ts",
+    "./index.js"
+  ]
+}
