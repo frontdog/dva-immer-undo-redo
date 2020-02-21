@@ -1,6 +1,6 @@
 # dva-immer-undo-redo
 
-A plugin of dva to support undo redo based on [Immer](https://immerjs.github.io/immer/docs/introduction). :clap
+A plugin of dva to support undo redo based on [Immer](https://immerjs.github.io/immer/docs/introduction).
 ## Install
 
 ```bash
